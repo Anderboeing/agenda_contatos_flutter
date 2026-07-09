@@ -10,20 +10,18 @@ final String imageColumn = "imageColumn";
 
 class ContactHelper {
   static final ContactHelper _instance = ContactHelper.internal();
-
   factory ContactHelper() => _instance;
-
   ContactHelper.internal();
 
   //criando banco de dados
-  Database _db;
+  late Database? _db;
 
   Future<Database> get db async {
     if (_db != null) {
-      return _db;
+      return _db!;
     } else {
       _db = await initDb();
-      return _db;
+      return _db!;
     }
   }
 
@@ -44,11 +42,11 @@ class ContactHelper {
 }
 
 class Contact {
-  int id;
-  String name;
-  String email;
-  String phone;
-  String image;
+  int? id;
+  String? name;
+  String? email;
+  String? phone;
+  String? image;
 
   Contact.fromMap(Map map) {
     id = map[idColumn];
