@@ -1,7 +1,6 @@
+import 'package:agenda_contatos/helpers/pubspec.yaml';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-
-import 'pubspec.yaml';
 
 final String contactTable = "contactTable";
 final String idColumn = "idColumn";
