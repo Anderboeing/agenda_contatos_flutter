@@ -85,6 +85,7 @@ class _HomePageState extends State<HomePage> {
                     image: imagePath != ""
                         ? FileImage(File(imagePath))
                         : AssetImage("images/person.png"),
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),

@@ -74,11 +74,12 @@ class _ContactPageState extends State<ContactPage> {
                       image: _editedContact.image != ""
                           ? FileImage(File(_editedContact.image))
                           : AssetImage("images/person.png"),
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
                 onTap: () {
-                  ImagePicker().pickImage(source: ImageSource.camera).then((
+                  ImagePicker().pickImage(source: ImageSource.gallery).then((
                     file,
                   ) {
                     if (file == null) return;
