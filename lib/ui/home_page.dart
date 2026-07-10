@@ -98,7 +98,67 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       onTap: () {
-        _shoContatPage(contacts[index]);
+        _showOptions(context, index);
+      },
+    );
+  }
+
+  void _showOptions(BuildContext context, int index) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return BottomSheet(
+          onClosing: () {},
+          builder: (context) {
+            return Container(
+              padding: EdgeInsets.all(10.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        "Ligar",
+                        style: TextStyle(color: Colors.red, fontSize: 20.0),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _shoContatPage(contacts[index]);
+                      },
+                      child: Text(
+                        "Editar",
+                        style: TextStyle(color: Colors.red, fontSize: 20.0),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: TextButton(
+                      onPressed: () {
+                        helper.deleteContact(contacts[index].id);
+                        setState(() {
+                          contacts.removeAt(index);
+                          Navigator.pop(context);
+                        });
+                      },
+                      child: Text(
+                        "Excluir",
+                        style: TextStyle(color: Colors.red, fontSize: 20.0),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
       },
     );
   }
