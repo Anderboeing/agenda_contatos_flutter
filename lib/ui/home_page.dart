@@ -109,20 +109,30 @@ class _HomePageState extends State<HomePage> {
       MaterialPageRoute(builder: (context) => ContactPage(contact: contact)),
     );
     if (recContact != null) {
-      if (contact.name != "") {
-        await helper.updateContact(recContact);
-      } else {
-        await helper.saveContact(recContact);
+      try {
+        if (contact.id != 0) {
+          await helper.updateContact(recContact);
+        } else {
+          await helper.saveContact(recContact);
+        }
+        _getAllContacts();
+      } catch (e, stack) {
+        print("[HOME] ERRO ao salvar contato: $e");
+        print(stack);
       }
-      _getAllContacts();
     }
   }
 
   void _getAllContacts() {
-    helper.getAllContacts().then((list) {
-      setState(() {
-        contacts = list.cast<Contact>();
-      });
-    });
+    helper
+        .getAllContacts()
+        .then((list) {
+          setState(() {
+            contacts = list.cast<Contact>();
+          });
+        })
+        .catchError((e) {
+          print("[HOME] ERRO em getAllContacts: $e");
+        });
   }
 }

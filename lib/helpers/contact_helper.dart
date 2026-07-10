@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path/path.dart';
 
 final String contactTable = "contactTable";
@@ -14,7 +18,7 @@ class ContactHelper {
   ContactHelper.internal();
 
   //criando banco de dados
-  late Database? _db;
+  Database? _db;
 
   Future<Database> get db async {
     if (_db != null) {
@@ -26,18 +30,43 @@ class ContactHelper {
   }
 
   Future<Database> initDb() async {
-    final databasesPath = await getDatabasesPath();
-    final path = join(databasesPath, "contactsNew.db");
+    String databasesPath;
 
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: (Database db, int newerVersion) async {
-        await db.execute(
-          "CREATE TABLE $contactTable($idColumn INTEGER PRIMARY KEY, $nameColumn TEXT, $emailColumn TEXT, $phoneColumn TEXT, $imageColumn TEXT)",
-        );
-      },
-    );
+    if (kIsWeb) {
+      // Web não é suportado. Rode o app em Windows ou Android.
+      throw UnsupportedError(
+        'SQLite não é suportado no navegador. Use flutter run -d windows ou um emulador Android.',
+      );
+    } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      // Desktop: usa sqflite_common_ffi
+      sqfliteFfiInit();
+      databasesPath = await databaseFactoryFfi.getDatabasesPath();
+      final path = join(databasesPath, "contactsNew.db");
+      return await databaseFactoryFfi.openDatabase(
+        path,
+        options: OpenDatabaseOptions(
+          version: 1,
+          onCreate: (Database db, int newerVersion) async {
+            await db.execute(
+              "CREATE TABLE $contactTable($idColumn INTEGER PRIMARY KEY, $nameColumn TEXT, $emailColumn TEXT, $phoneColumn TEXT, $imageColumn TEXT)",
+            );
+          },
+        ),
+      );
+    } else {
+      // Mobile (Android / iOS): usa sqflite nativo
+      databasesPath = await getDatabasesPath();
+      final path = join(databasesPath, "contactsNew.db");
+      return await openDatabase(
+        path,
+        version: 1,
+        onCreate: (Database db, int newerVersion) async {
+          await db.execute(
+            "CREATE TABLE $contactTable($idColumn INTEGER PRIMARY KEY, $nameColumn TEXT, $emailColumn TEXT, $phoneColumn TEXT, $imageColumn TEXT)",
+          );
+        },
+      );
+    }
   }
 
   Future<Contact> saveContact(Contact contact) async {
@@ -114,11 +143,11 @@ class Contact {
   Contact();
 
   Contact.fromMap(Map map) {
-    id = map[idColumn];
-    name = map[nameColumn];
-    email = map[emailColumn];
-    phone = map[phoneColumn];
-    image = map[imageColumn];
+    id = map[idColumn] ?? 0;
+    name = map[nameColumn] ?? "";
+    email = map[emailColumn] ?? "";
+    phone = map[phoneColumn] ?? "";
+    image = map[imageColumn] ?? "";
   }
 
   Map<String, Object?> toMap() {
@@ -128,7 +157,11 @@ class Contact {
       phoneColumn: phone,
       imageColumn: image,
     };
-    map[idColumn] = id;
+    // Só inclui o id se o contato já existir no banco.
+    // Se id == 0, o SQLite gera o id automaticamente (autoincrement).
+    if (id != 0) {
+      map[idColumn] = id;
+    }
     return map;
   }
 
