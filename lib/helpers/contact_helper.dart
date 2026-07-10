@@ -105,11 +105,11 @@ class ContactHelper {
 }
 
 class Contact {
-  int? id;
-  String? name;
-  String? email;
-  String? phone;
-  String? image;
+  int id = 0;
+  String name = "";
+  String email = "";
+  String phone = "";
+  String image = "";
 
   Contact();
 
@@ -128,9 +128,7 @@ class Contact {
       phoneColumn: phone,
       imageColumn: image,
     };
-    if (id != null) {
-      map[idColumn] = id;
-    }
+    map[idColumn] = id;
     return map;
   }
 
