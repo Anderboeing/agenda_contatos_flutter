@@ -5,6 +5,8 @@ import 'package:agenda_contatos/ui/contact_page.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+enum OrderOptions { orderAZ, orderZA }
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -31,6 +33,21 @@ class _HomePageState extends State<HomePage> {
         title: Text("Contatos", style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.red,
         centerTitle: true,
+        actions: [
+          PopupMenuButton<OrderOptions>(
+            itemBuilder: (context) => <PopupMenuEntry<OrderOptions>>[
+              const PopupMenuItem<OrderOptions>(
+                child: Text("Ordenar de A a Z"),
+                value: OrderOptions.orderAZ,
+              ),
+              const PopupMenuItem<OrderOptions>(
+                child: Text("Ordenar de Z a A"),
+                value: OrderOptions.orderZA,
+              ),
+            ],
+            onSelected: _orderList,
+          ),
+        ],
       ),
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
@@ -199,5 +216,22 @@ class _HomePageState extends State<HomePage> {
         .catchError((e) {
           print("[HOME] ERRO em getAllContacts: $e");
         });
+  }
+
+  void _orderList(OrderOptions result) {
+    switch (result) {
+      case OrderOptions.orderAZ:
+        contacts.sort((a, b) {
+          return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        });
+        break;
+      case OrderOptions.orderZA:
+        contacts.sort((a, b) {
+          return b.name.toLowerCase().compareTo(a.name.toLowerCase());
+        });
+        break;
+    }
+
+    setState(() {});
   }
 }
